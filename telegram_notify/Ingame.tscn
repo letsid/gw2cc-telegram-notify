@@ -1,0 +1,20 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://plugins/telegram_notify/Ingame.gd" id="1_ingame"]
+[ext_resource type="PackedScene" path="res://plugins/telegram_notify/ui/Window.tscn" id="2_window"]
+[ext_resource type="Theme" uid="uid://ctratp2uvuinq" path="res://assets/default_theme.tres" id="3_theme"]
+
+[node name="Ingame" type="Button"]
+custom_minimum_size = Vector2(25, 25)
+offset_right = 28.0
+offset_bottom = 25.0
+theme = ExtResource("3_theme")
+theme_type_variation = &"IconPluginButton"
+text = "TG"
+tooltip_text = "Telegram Notify"
+script = ExtResource("1_ingame")
+window = NodePath("Window")
+
+[node name="Window" parent="." instance=ExtResource("2_window")]
+unique_name_in_owner = true
+visible = false

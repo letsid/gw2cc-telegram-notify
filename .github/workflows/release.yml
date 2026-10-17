@@ -1,0 +1,46 @@
+name: Release
+
+# Push a tag like v0.1.0 (or run manually with a tag) to build the plugin zip and publish a GitHub release.
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag, e.g. v0.1.0"
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    env:
+      TAG: ${{ github.event.inputs.tag || github.ref_name }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check version in MetaInfo.tres matches tag
+        run: |
+          version=$(sed -n 's/^version = "\(.*\)"/\1/p' telegram_notify/MetaInfo.tres)
+          if [ "v${version}" != "${TAG}" ]; then
+            echo "::error::MetaInfo.tres version is ${version}, tag is ${TAG}"
+            exit 1
+          fi
+
+      - name: Build zip
+        run: |
+          mkdir -p dist
+          find telegram_notify -name '*.uid' -delete
+          zip -r -X "dist/telegram_notify-${TAG}.zip" telegram_notify README.md LICENSE
+          (cd dist && sha256sum "telegram_notify-${TAG}.zip" > "telegram_notify-${TAG}.zip.sha256")
+
+      - name: Publish release
+        run: |
+          if gh release view "${TAG}" >/dev/null 2>&1; then
+            gh release upload "${TAG}" dist/* --clobber
+          else
+            gh release create "${TAG}" dist/* --title "telegram-notify ${TAG}" --generate-notes --target "${GITHUB_SHA}"
+          fi

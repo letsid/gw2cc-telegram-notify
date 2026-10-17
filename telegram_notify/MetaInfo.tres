@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ModMetaInfo" load_steps=2 format=3]
+
+[ext_resource type="Script" uid="uid://co23rwjmt1ioa" path="res://libcc/mods/ModMetaInfo.gd" id="1_meta"]
+
+[resource]
+script = ExtResource("1_meta")
+product_name = "telegram-notify"
+author = "letsid"
+version = "0.1.0"
+category = 4
+description = "Telegram notifications: character death, commander leaves map / goes offline, name mentioned in chat, whispers"
