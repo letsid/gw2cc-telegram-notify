@@ -79,6 +79,7 @@ func _build_ui() -> void:
 	_add_bool(vb, Settings.ON_COMMANDER_CHANGE, "Squad commander changes / switches tag colour")
 	_add_bool(vb, Settings.ON_MENTION, "Character or account name mentioned in chat")
 	_add_bool(vb, Settings.ON_WHISPER, "Whisper received")
+	_add_bool(vb, Settings.ON_INVENTORY_FULL, "Inventory full")
 	_keywords_edit = _add_line(vb, "Extra keywords (comma separated)", "e.g. nickname, guild tag")
 	_keywords_edit.text_submitted.connect(func(_t: String) -> void: _save_fields())
 	_keywords_edit.focus_exited.connect(_save_fields)

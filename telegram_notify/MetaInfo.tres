@@ -6,6 +6,6 @@
 script = ExtResource("1_meta")
 product_name = "telegram-notify"
 author = "letsid"
-version = "0.1.1"
+version = "0.2.0"
 category = 4
-description = "Telegram notifications: character death, commander leaves map / goes offline, name mentioned in chat, whispers"
+description = "Telegram notifications: character death, commander changes / leaves map / goes offline, name mentioned in chat, whispers, inventory full"

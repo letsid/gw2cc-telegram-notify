@@ -12,6 +12,7 @@ const ON_COMMANDER := "on_commander"
 const ON_COMMANDER_CHANGE := "on_commander_change"
 const ON_MENTION := "on_mention"
 const ON_WHISPER := "on_whisper"
+const ON_INVENTORY_FULL := "on_inventory_full"
 const KEYWORDS := "extra_keywords"
 
 const DEFAULTS: Dictionary = {
@@ -23,6 +24,7 @@ const DEFAULTS: Dictionary = {
 	ON_COMMANDER_CHANGE: true,
 	ON_MENTION: true,
 	ON_WHISPER: true,
+	ON_INVENTORY_FULL: true,
 	KEYWORDS: "",
 }
 

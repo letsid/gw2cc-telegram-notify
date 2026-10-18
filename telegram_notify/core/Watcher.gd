@@ -12,6 +12,8 @@ const MENTION_COOLDOWN_MS := 10000
 ## Combat log channels (ChatManager CHAT_CHANNEL_COMBAT .. COMBAT_OUT_STRIKE) are never scanned.
 const COMBAT_CHANNEL_MAX := 11
 const CHANNEL_WHISPER := 42
+## Inventory must be full (or not full again) for this many polls before the state flips.
+const INVENTORY_CONFIRM_POLLS := 3
 
 static var _logger := ScopedLogger.create(Settings.PLUGIN_NAME)
 
@@ -30,6 +32,8 @@ var _cmd_status: String = ""
 var _cmd_pending: String = ""
 var _cmd_pending_polls: int = 0
 var _own_map: int = 0
+var _inv_full: bool = false
+var _inv_flip_polls: int = 0
 var _cmd_tag: int = 0
 ## After a confirmed "gone" the next commander in the same squad is reported as a change.
 var _announce_next: bool = false
@@ -47,6 +51,7 @@ func _process(_delta: float) -> void:
 	_ensure_connections()
 	_poll_death()
 	_poll_commander()
+	_poll_inventory()
 	_prune(now)
 
 
@@ -175,6 +180,47 @@ func _poll_death() -> void:
 		_notify("☠️ %s died on %s." % [_own_character_name(), _map_text(_current_map())])
 	elif state == HealthBar.DEAD_STATE_DOWNED and previous == HealthBar.DEAD_STATE_ALIVE and Settings.get_bool(Settings.ON_DOWNED):
 		_notify("🩸 %s is downed on %s." % [_own_character_name(), _map_text(_current_map())])
+
+
+# ---------------------------------------------------------------- inventory
+
+func _poll_inventory() -> void:
+	var inv: InventoryLocation = _inventory()
+	if inv == null:
+		_inv_flip_polls = 0
+		return
+	var full: bool = inv.is_full()
+	if full == _inv_full:
+		_inv_flip_polls = 0
+		return
+	_inv_flip_polls += 1
+	if _inv_flip_polls < INVENTORY_CONFIRM_POLLS:
+		return
+	_inv_flip_polls = 0
+	_inv_full = full
+	_logger.info("[inventory] full=%s (%s)" % [full, _slot_text(inv)])
+	if full and Settings.get_bool(Settings.ON_INVENTORY_FULL):
+		_notify("🎒 Inventory of %s is full (%s) on %s." % [_own_character_name(), _slot_text(inv), _map_text(_current_map())])
+
+
+static func _inventory() -> InventoryLocation:
+	var cc: AgentChar = Manager.agent.controlled_character if Manager.agent else null
+	if not cc or not cc.has_component(ItemStorage):
+		return null
+	var locations: Array = cc.item_storage.item_locations
+	if locations.size() <= InventoryLocation.LOCATION_INVENTORY:
+		return null
+	var loc: Variant = locations[InventoryLocation.LOCATION_INVENTORY]
+	return loc as InventoryLocation if loc is InventoryLocation else null
+
+
+## "used/max slots"; max_size may include slots of empty bag positions.
+static func _slot_text(inv: InventoryLocation) -> String:
+	var used: int = 0
+	for item in inv.items.values():
+		if item != null:
+			used += 1
+	return "%d/%d slots" % [used, int(inv.max_size)]
 
 
 # ---------------------------------------------------------------- commander

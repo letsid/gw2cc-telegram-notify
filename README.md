@@ -15,6 +15,7 @@ A **gw2cc** plugin that messages you through your own Telegram bot when somethin
 | Commander switches tag colour | on | `🎨 Commander A switched to red tag (was blue tag).` |
 | Character or account name mentioned in chat | on | `📣 Mentioned ("name") in map by Someone: …` |
 | Whisper received | on | `💬 Whisper from Name.1234: …` |
+| Inventory full | on | `🎒 Inventory of Charname is full (80/80 slots) on …` |
 
 Every message starts with `[Character name]`, so you can tell which client sent it when you run several.
 
@@ -58,6 +59,7 @@ If "Find chat ID" finds nothing, send the bot another message and try again. You
   When you change maps yourself, you get no "left the map" notification.
 - **Offline detection:** gw2cc's presence status values are not documented. A status containing "offline" or "invisible", or a missing map, counts as offline. Commander status changes are written to the log (`[commander] … status '…' -> '…'`).
 - **Tag colour** is read from the squad data and shown as `<colour> tag` or `<colour> catmander`.
+- **Inventory full** uses the client's own "inventory full" check and must hold for about 3 seconds. You get one message per fill; it re-arms once the inventory has free space again.
 
 ## Layout
 
@@ -67,7 +69,7 @@ telegram_notify/
   Ingame.tscn / .gd      "TG" menu button, starts the client and the watcher
   core/Settings.gd       Config keys (ConfigService section "telegram-notify")
   core/TelegramClient.gd Queue and HTTP calls to the Telegram Bot API
-  core/Watcher.gd        Death, commander, chat mentions, whispers
+  core/Watcher.gd        Death, commander, chat mentions, whispers, inventory
   ui/Window.gd / .tscn   Settings window
 ```
 
