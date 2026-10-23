@@ -84,6 +84,10 @@ func _build_ui() -> void:
 	_keywords_edit.text_submitted.connect(func(_t: String) -> void: _save_fields())
 	_keywords_edit.focus_exited.connect(_save_fields)
 
+	_section(vb, "Bot commands")
+	_add_bool(vb, Settings.ALLOW_QUIT, "Allow /quit (closes the client)")
+	_hint(vb, "Commands are only accepted from the chat ID above. With several clients on one bot only one of them receives commands.")
+
 	_status_label = Label.new()
 	_status_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_status_label.text = "Status: idle"

@@ -26,6 +26,18 @@ Mentions are detected for:
 
 Only whole words count, so "Ann" does not trigger on "Anna". Combat log channels and your own messages are ignored. Identical messages are merged, and each sender has a 10 second cooldown.
 
+## Bot commands
+
+Send these to your bot in Telegram. They are only accepted from the chat ID configured in the plugin.
+
+| Command | Effect |
+|---|---|
+| `/quit` | Closes the gw2cc client (graceful shutdown). The bot replies `👋 Closing gw2cc.` first. Can be turned off with **Allow /quit**. |
+| `/help` | Lists the commands. |
+
+Commands sent while the client is closed or loading a map are discarded, so an old `/quit` never closes the client right after you start it.
+Telegram lets only one program read a bot's messages at a time. If you run several clients with the same bot, only one of them receives commands (the plugin shows "another client polls this bot"); notifications still work from all of them. Use a separate bot per client if each should be controllable.
+
 ## Installation
 
 1. Download the latest `telegram_notify-vX.Y.Z.zip` from [Releases](../../releases).
@@ -40,14 +52,14 @@ Only whole words count, so "Ann" does not trigger on "Anna". Combat log channels
    A bot can only message you after you have messaged it.
 3. In the client, click **TG** in the top bar.
 4. Paste the token into **Bot token**.
-5. Click **Find chat ID**. The plugin reads your `/start` message and fills in the chat ID.
+5. Click **Find chat ID**. The plugin reads your latest message to the bot and fills in the chat ID.
 6. Click **Send test message**. If the test message arrives, you are done.
 
-If "Find chat ID" finds nothing, send the bot another message and try again. You can also look up the chat ID yourself: open `https://api.telegram.org/bot<TOKEN>/getUpdates` in a browser and look for `"chat":{"id":…}`.
+If "Find chat ID" says it is waiting, send the bot another message; the chat ID is filled in as soon as it arrives. You can also look up the chat ID yourself: open `https://api.telegram.org/bot<TOKEN>/getUpdates` in a browser and look for `"chat":{"id":…}`.
 
 ## Privacy and security
 
-- The plugin only sends messages to `api.telegram.org`, addressed to the chat ID you enter.
+- The plugin only talks to `api.telegram.org`: it sends messages to the chat ID you enter and polls the bot for commands.
 - The bot token is stored **in plain text** in the gw2cc config. Do not share the config file.
 - If your token has leaked, create a new one with `/revoke` at @BotFather.
 - Whispers and chat messages that trigger a notification are also written to the local gw2cc log.
@@ -66,9 +78,9 @@ If "Find chat ID" finds nothing, send the bot another message and try again. You
 ```
 telegram_notify/
   MetaInfo.tres          Plugin metadata (product_name telegram-notify)
-  Ingame.tscn / .gd      "TG" menu button, starts the client and the watcher
+  Ingame.tscn / .gd      "TG" menu button, starts the client and the watcher, handles /quit
   core/Settings.gd       Config keys (ConfigService section "telegram-notify")
-  core/TelegramClient.gd Queue and HTTP calls to the Telegram Bot API
+  core/TelegramClient.gd Send queue and command polling (Telegram Bot API)
   core/Watcher.gd        Death, commander, chat mentions, whispers, inventory
   ui/Window.gd / .tscn   Settings window
 ```
